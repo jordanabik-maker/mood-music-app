@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mood Music Player</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+</head>
+<body>
+
+<h1>Mood Music Player </h1>
+
+<button onclick="getSongs('happy')">Happy</button>
+<button onclick="getSongs('sad')">Sad</button>
+<button onclick="getSongs('focus')">Focus</button>
+<button onclick="getSongs('hype')">Hype</button>
+<button onclick="getSongs('chill')">Chill</button>
+
+<div id="songs"></div>
+
+<hr>
+
+<div>
+    {% for track in songs %}
+    <p>{{ track.name }}</p>
+
+    {% if track.preview_url %}
+        <audio controls src="{{ track.preview_url }}"></audio>
+    {% endif %}
+{% endfor %}
+</div>
+<script>
+async function getSongs(mood) {
+    const res = await fetch(`/songs/${mood}`);
+    const data = await res.json();
+
+    const songsDiv = document.getElementById("songs");
+    songsDiv.innerHTML = "";
+
+    data.songs.forEach(track => {
+        const div = document.createElement("div");
+         div.classList.add("song-card");
+
+        div.innerHTML = `
+            <img src="${track.album.images[0].url}" width="200">
+            <p><strong>${track.name}</strong></p>
+            <p>${track.artists[0].name}</p>
+            ${track.preview_url ? `<audio controls src="${track.preview_url}"></audio>` : ""}
+        `;
+
+        songsDiv.appendChild(div);
+    });
+}
+</script>
+</body>
+</html>
